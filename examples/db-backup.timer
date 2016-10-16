@@ -1,0 +1,6 @@
+[Unit]
+Description=Daily Backup of MySQL data
+
+[Timer]
+OnBootSec=60min
+OnUnitActiveSec=1d

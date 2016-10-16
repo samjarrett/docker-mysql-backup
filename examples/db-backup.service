@@ -1,0 +1,17 @@
+[Unit]
+Description=MySQL db
+Requires=docker.service
+Requires=db.service
+After=docker.service
+
+[Service]
+TimeoutStartSec=0
+ExecStartPre=/usr/bin/docker build --pull -t samjarrett/mysql-backup:latest /root/mysql-backup
+ExecStart=/usr/bin/docker run --rm --name db-backup \
+        -e AWS_S3_BUCKET_NAME -e AWS_DEFAULT_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY \
+        --link db \
+        samjarrett/mysql-backup
+
+[Install]
+WantedBy=multi-user.target
+

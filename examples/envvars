@@ -1,0 +1,7 @@
+DB_HOST=db
+DB_USER=root
+DB_PASSWORD=my-password
+AWS_S3_BUCKET_NAME=my-s3-bucket-name
+AWS_DEFAULT_REGION=ap-southeast-2
+AWS_ACCESS_KEY_ID=access-key-id
+AWS_SECRET_ACCESS_KEY=secret-access-key-id

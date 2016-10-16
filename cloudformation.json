@@ -1,0 +1,91 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Parameters": {
+        "S3BucketName": {
+            "Description": "Enter the name of the S3 bucket you want to create",
+            "Type": "String"
+        }
+    },
+    "Resources": {
+        "BackupBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "AccessControl": "Private",
+                "BucketName": {
+                    "Ref": "S3BucketName"
+                },
+                "VersioningConfiguration": {
+                    "Status": "Enabled"
+                },
+                "LifecycleConfiguration": {
+                    "Rules": [
+                        {
+                            "Id": "Archive",
+                            "Status": "Enabled",
+                            "Transitions": [{
+                                "StorageClass": "STANDARD_IA",
+                                "TransitionInDays": 30
+                            }]
+                        }
+                    ]
+                }
+            }
+        },
+        "BackupUser": {
+            "Type": "AWS::IAM::User",
+            "Properties": {
+                "Policies": [{
+                    "PolicyName": "BackupBucket",
+                    "PolicyDocument": {
+                        "Version": "2012-10-17",
+                        "Statement": [{
+                            "Action": [
+                                "s3:PutObject",
+                                "s3:GetObject",
+                                "s3:ListBucket"
+                            ],
+                            "Effect": "Allow",
+                            "Resource": [{
+                                "Fn::Join": ["", ["arn:aws:s3:::", {
+                                    "Ref": "BackupBucket"
+                                }]]
+                            }, {
+                                "Fn::Join": ["", ["arn:aws:s3:::", {
+                                    "Ref": "BackupBucket"
+                                }, "/*"]]
+                            }]
+                        }]
+                    }
+                }]
+            }
+        },
+        "BackupUserAccessKey": {
+            "Type": "AWS::IAM::AccessKey",
+            "Properties": {
+                "UserName": {
+                    "Ref": "BackupUser"
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "BucketName": {
+            "Value": {
+                "Ref": "BackupBucket"
+            }
+        },
+        "AccessKeyId": {
+            "Value": {
+                "Ref": "BackupUserAccessKey"
+            }
+        },
+        "AccessKeySecret": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "BackupUserAccessKey",
+                    "SecretAccessKey"
+                ]
+            }
+        }
+    }
+}
