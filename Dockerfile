@@ -29,5 +29,5 @@ CMD set -xe && \
         mysqldump ${DUMP_FLAGS} --databases $database --result-file=/backups/$database.sql; \
         gzip -9 /backups/$database.sql; \
     done && \
-    aws s3 sync /backups/ s3://${AWS_S3_BUCKET_NAME}/$(date +%Y-%m-%d)/ && \
+    aws s3 sync /backups/ s3://${AWS_S3_BUCKET_NAME}/$(date +%Y)/$(date +%Y-%m)/$(date +%Y-%m-%d)/ && \
     true
